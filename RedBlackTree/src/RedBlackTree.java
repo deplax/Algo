@@ -1,3 +1,7 @@
+import java.nio.file.FileVisitOption;
+
+import javax.print.attribute.standard.Fidelity;
+
 public class RedBlackTree {
 	public static void main(String[] args) {
 
@@ -81,7 +85,7 @@ public class RedBlackTree {
 					node.parent.parent.color = Color.RED;
 					rightRotate(tree, node.parent.parent);
 				}
-			}else{
+			} else {
 				Node uncleNode = node.parent.parent.leftChild;
 				if (uncleNode.color == Color.RED) {
 					node.parent.color = Color.BLACK;
@@ -100,6 +104,102 @@ public class RedBlackTree {
 			}
 		}
 		tree.root.color = Color.BLACK;
+	}
+
+	public void transPlant(Tree tree, Node oldNode, Node plantNode) {
+		if (oldNode.parent == tree.nil)
+			tree.root = plantNode;
+		else if (oldNode == oldNode.parent.leftChild)
+			oldNode.parent.leftChild = plantNode;
+		else
+			oldNode.parent.rightChild = plantNode;
+		plantNode.parent = oldNode.parent;
+	}
+
+	public void delete(Tree tree, Node node) {
+		Color erasedColor = node.color;
+		if (node.leftChild == tree.nil) {
+			Node fixupNode = node.rightChild;
+			transPlant(tree, node, node.rightChild);
+		} else if (node.rightChild == tree.nil) {
+			Node fixupNode = node.leftChild;
+			transPlant(tree, node, node.leftChild);
+		} else {
+			Node succesor = treeMinimun(node.rightChild);
+			erasedColor = succesor.color;
+			Node fixupNode = succesor.rightChild;
+			if (succesor.parent == deleteNode) {
+				fixupNode.parent = succesor;
+			} else {
+				transPlant(tree, succesor, succesor.rightChild);
+				succesor.rightChild = node.rightChild;
+				succesor.rightChild.parent = succesor;
+			}
+			transPlant(tree, node, succesor);
+			succesor.leftChild = node.leftChild;
+			succesor.leftChild.parent = succesor;
+			succesor.color = node.color;
+		}
+		if (erasedColor == Color.BLACK)
+			deleteFixup(tree, fixupNode);
+	}
+
+	public void deleteFixup(Tree tree, Node fixupNode) {
+		while (fixupNode != tree.root && fixupNode.color == Color.BLACK) {
+			if (fixupNode == fixupNode.parent.leftChild) {
+				Node sibling = fixupNode.parent.leftChild;
+				if (sibling.color == Color.RED) {
+					sibling.color = Color.BLACK;
+					fixupNode.parent.color = Color.RED;
+					leftRotate(tree, fixupNode);
+					sibling = fixupNode.parent.rightChild;
+				}
+				if (sibling.leftChild.color == Color.BLACK
+						&& sibling.rightChild.color == Color.BLACK) {
+					sibling.color = Color.RED;
+					fixupNode = fixupNode.parent;
+				} else {
+					if (sibling.rightChild.color == Color.BLACK) {
+						sibling.leftChild.color = Color.BLACK;
+						sibling.color = Color.RED;
+						rightRotate(tree, sibling);
+						sibling = fixupNode.parent.rightChild;
+					}
+					sibling.color = fixupNode.parent.rightChild.color;
+					fixupNode.parent.color = Color.BLACK;
+					sibling.rightChild.color = Color.BLACK;
+					leftRotate(tree, fixupNode.parent);
+					fixupNode = tree.root;
+				}
+			} else {
+				//Right에 대하여 그대로 반복
+				Node sibling = fixupNode.parent.leftChild;
+				if (sibling.color == Color.RED) {
+					sibling.color = Color.BLACK;
+					fixupNode.parent.color = Color.RED;
+					leftRotate(tree, fixupNode);
+					sibling = fixupNode.parent.rightChild;
+				}
+				if (sibling.leftChild.color == Color.BLACK
+						&& sibling.rightChild.color == Color.BLACK) {
+					sibling.color = Color.RED;
+					fixupNode = fixupNode.parent;
+				} else {
+					if (sibling.rightChild.color == Color.BLACK) {
+						sibling.leftChild.color = Color.BLACK;
+						sibling.color = Color.RED;
+						rightRotate(tree, sibling);
+						sibling = fixupNode.parent.rightChild;
+					}
+					sibling.color = fixupNode.parent.rightChild.color;
+					fixupNode.parent.color = Color.BLACK;
+					sibling.rightChild.color = Color.BLACK;
+					leftRotate(tree, fixupNode.parent);
+					fixupNode = tree.root;
+				}
+			}
+		}
+		fixupNode.color = Color.BLACK;
 	}
 }
 
@@ -120,3 +220,8 @@ class Tree {
 enum Color {
 	RED, BLACK
 };
+
+
+// 케이스에 대한 테스트 함수
+// 레드블랙 트리 특성이 맞는지 확인하는 함수
+// ㄴ 경로상의 블랙 수가 같는지 등등.
