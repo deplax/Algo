@@ -131,7 +131,7 @@ class MaximumSubarrayN2 {
 		int maxSum = Integer.MIN_VALUE;
 		int sum = 0;
 		for (int i = 0; i < arr.length; i++) {
-			for (int j = i; j < arr.length; j++) {
+			for (int j = i; j < arr.length; j++) { 
 				sum += arr[j];
 				if(sum > maxSum){
 					maxSum = sum;
