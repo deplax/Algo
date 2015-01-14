@@ -3,15 +3,93 @@ import java.util.Queue;
 
 public class RedBlackTree {
 	public static void main(String[] args) {
+		Tree tree = new Tree();
+		Node node0 = new Node();
+		Node node1 = new Node();
+		Node node2 = new Node();
+		Node node3 = new Node();
+		Node node4 = new Node();
+		Node node5 = new Node();
+
+		node0.key = 10;
+		node1.key = 50;
+		node2.key = 20;
+		node3.key = 20;
+		node4.key = 70;
+		node5.key = 30;
+
+		node0.leftChild = node1;
+		node0.rightChild = node2;
+		node1.leftChild = node3;
+		node1.rightChild = node4;
+		node2.leftChild = tree.nil;
+		node2.rightChild = node5;
+		node3.leftChild = tree.nil;
+		node3.rightChild = tree.nil;
+		node4.leftChild = tree.nil;
+		node4.rightChild = tree.nil;
+		node5.leftChild = tree.nil;
+		node5.rightChild = tree.nil;
+
+		tree.root = node0;
+		tree.nodeNum = 6;
+
+		RedBlackTree rbt = new RedBlackTree();
+		rbt.printTree(tree);
+
+	}
+
+	public void printTree(Tree tree) {
+		Queue<Node> queue = new LinkedList<Node>();
+		if (tree.nodeNum == 0)
+			return;
+		queue.add(tree.root);
+		Node node;
+		int height = (int) (Math.log10(tree.nodeNum) / Math.log10(2)) * 2 + 1;
+		int level = 1;
+		
+		//트리의 최대크기를 넘지 않는 배열을 만든다.
+		int cntNode = 0;
+		for(int i = 0; i < height; i++)
+			cntNode += (int)Math.pow(2, i);
+		Node[] nodeArr = new Node[cntNode];
+		
+		//빈 노드
+		Node emptyNode = new Node();
+		
+		int cnt = 1;
+		while (tree.nodeNum < 0) {
+			node = queue.remove();
+			if(node != null && node != tree.nil)
+				tree.nodeNum--;
+			nodeArr[cnt++] = node;
+			
+			if (node.leftChild != tree.nil)
+				queue.add(node.leftChild);
+			else if (node.leftChild == null || node.leftChild == tree.nil)
+				queue.add(emptyNode);
+				
+			if (node.rightChild != tree.nil)
+				queue.add(node.rightChild);
+			else if (node.rightChild == null || node.rightChild == tree.nil)
+				queue.add(emptyNode);
+		}
+		
+		for(int i = 0; i < height; i++){
+			for(int j = 1; j < nodeArr.length; j++)
+				System.out.println(nodeArr[j].key);
+		}
+		// ***********************
+		// ***********************
+		// ******10***************
+		// **50******20***********
+		// 20**70**30**30*********
 
 	}
 	
-	public void printTree(Tree tree){
-		Queue<Node> queue = new LinkedList<Node>();
-		if(tree.nodeNum == 0)
-			return;
-		
-		
+	public void printSpace(int num){
+		for (int i = 0; i < num; i++)
+			System.out.print("*");
 	}
 
 	// 1.노드는 RED or BLACK
@@ -241,8 +319,6 @@ class Tree {
 enum Color {
 	RED, BLACK
 };
-
-
 
 // 케이스에 대한 테스트 함수
 // 레드블랙 트리 특성이 맞는지 확인하는 함수
