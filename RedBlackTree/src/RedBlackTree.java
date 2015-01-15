@@ -18,6 +18,13 @@ public class RedBlackTree {
 		node4.key = 70;
 		node5.key = 30;
 
+		node0.color = Color.BLACK;
+		node1.color = Color.RED;
+		node2.color = Color.BLACK;
+		node3.color = Color.RED;
+		node4.color = Color.BLACK;
+		node5.color = Color.RED;
+
 		node0.leftChild = node1;
 		node0.rightChild = node2;
 		node1.leftChild = node3;
@@ -32,62 +39,127 @@ public class RedBlackTree {
 		node5.rightChild = tree.nil;
 
 		tree.root = node0;
-		tree.nodeNum = 6;
+		tree.nodeCnt = 6;
 
 		RedBlackTree rbt = new RedBlackTree();
-		rbt.printTree(tree);
+		LinkedList<Node> nodeList = rbt.createLinkedList(tree);
+		rbt.printTree(tree, 2);
+	}
+
+	public void printTree(Tree tree, int pad) {
+		LinkedList<Node> nodeList = createLinkedList(tree);
+		int maxLevel = maxLevel(nodeList);
+		int maxLevelCnt = (int) Math.pow(2, maxLevel) + ((int) Math.pow(2, maxLevel) / 2);
+
+		int nodeSize = nodeSize(nodeList) + pad;
+		int[] nodeSizeArr = createNodeSizeArray(nodeList, pad);
+		System.out.println("nodeSize : " + nodeSize);
+
+		int maxWidth = (nodeSize + 1) * maxLevelCnt;
+
+		int nodeNum = 0;
+		boolean tictok = false; // true = node;
+		for (int level = 0; level <= maxLevel; level++) {
+			int prevSpace = 0;
+			for (int col = 0; col < Math.pow(2, level) * 2; col++) {
+				if (tictok == false) {
+					// space
+					int space = (int)(maxWidth / Math.pow(2, level + 1) * (col + 1));
+					int nodeHalf = nodeSizeArr[nodeNum + (col / 2)] / 2;
+					int prevNodeSize = (col / 2) * (nodeSize);
+					printSpace(space - nodeHalf - prevNodeSize - prevSpace);
+					prevSpace += space - nodeHalf - prevNodeSize - prevSpace;
+					tictok = true;
+				} else {
+					// node
+					Node node = nodeList.get(nodeNum + (col / 2));
+					if (Color.BLACK == node.color)
+						System.out.print("B:" + node.key);
+					else if (Color.RED == node.color)
+						System.out.print("R:" + node.key);
+					else
+						printSpace(pad + 2);
+					tictok = false;
+				}
+			}
+			nodeNum += Math.pow(2, level);
+			System.out.println();
+		}
 
 	}
 
-	public void printTree(Tree tree) {
+	// 출력을 위한 함수. 트리의 최대 깊이를 구한다. [0부터 시작]
+	public int maxLevel(LinkedList<Node> nodeList) {
+		int nodeCnt = nodeList.size();
+		int level = 0;
+		while (nodeCnt > 0) {
+			nodeCnt /= 2;
+			level++;
+		}
+		return level - 1;
+	}
+
+	// 출력을 위한 함수. 각 노드의 평균길이를 구한다.
+	public int nodeSize(LinkedList<Node> nodeList) {
+		int cnt = 0;
+		int sum = 0;
+		for (Node n : nodeList) {
+			if (n.key != 0) {
+				String str = String.valueOf(n.key);
+				cnt++;
+				sum += str.length();
+			}
+		}
+		return (int) sum / cnt;
+	}
+
+	// 출력을 위한 함수. BSF를 통해 LinkedList로 변환한다.
+	public LinkedList<Node> createLinkedList(Tree tree) {
+		LinkedList<Node> nodeList = new LinkedList<Node>();
+		int cnt = tree.nodeCnt;
+
+		// tree -> queue -> LinkedList
 		Queue<Node> queue = new LinkedList<Node>();
-		if (tree.nodeNum == 0)
-			return;
-		queue.add(tree.root);
-		Node node;
-		int height = (int) (Math.log10(tree.nodeNum) / Math.log10(2)) * 2 + 1;
-		int level = 1;
-		
-		//트리의 최대크기를 넘지 않는 배열을 만든다.
-		int cntNode = 0;
-		for(int i = 0; i < height; i++)
-			cntNode += (int)Math.pow(2, i);
-		Node[] nodeArr = new Node[cntNode];
-		
-		//빈 노드
-		Node emptyNode = new Node();
-		
-		int cnt = 1;
-		while (tree.nodeNum < 0) {
-			node = queue.remove();
-			if(node != null && node != tree.nil)
-				tree.nodeNum--;
-			nodeArr[cnt++] = node;
-			
-			if (node.leftChild != tree.nil)
-				queue.add(node.leftChild);
-			else if (node.leftChild == null || node.leftChild == tree.nil)
-				queue.add(emptyNode);
-				
-			if (node.rightChild != tree.nil)
-				queue.add(node.rightChild);
-			else if (node.rightChild == null || node.rightChild == tree.nil)
-				queue.add(emptyNode);
-		}
-		
-		for(int i = 0; i < height; i++){
-			for(int j = 1; j < nodeArr.length; j++)
-				System.out.println(nodeArr[j].key);
-		}
-		// ***********************
-		// ***********************
-		// ******10***************
-		// **50******20***********
-		// 20**70**30**30*********
+		if (tree.root == null)
+			return null;
+		queue.offer(tree.root);
 
+		Node emptyNode = new Node();
+
+		while (!queue.isEmpty() && cnt != 0) {
+			Node tempNode = queue.poll();
+			nodeList.addLast(tempNode);
+			if (!tempNode.equals(tree.nil) && !tempNode.equals(emptyNode))
+				cnt--;
+
+			if (tempNode == emptyNode)
+				continue;
+
+			if (tempNode.leftChild == tree.nil)
+				queue.offer(emptyNode);
+			else
+				queue.offer(tempNode.leftChild);
+			if (tempNode.rightChild == tree.nil)
+				queue.offer(emptyNode);
+			else
+				queue.offer(tempNode.rightChild);
+		}
+
+		return nodeList;
 	}
-	
-	public void printSpace(int num){
+
+	// 출력을 위한 함수. 각 노드의 길이를 배열에 저장한다.
+	public int[] createNodeSizeArray(LinkedList<Node> nodeList, int pad) {
+		int[] nodeSizeArr = new int[nodeList.size()];
+		for (int i = 0; i < nodeList.size(); i++) {
+			String str = String.valueOf(nodeList.get(i).key);
+			nodeSizeArr[i] = str.length() + pad;
+		}
+		return nodeSizeArr;
+	}
+
+	// 출력을 위한 함수. 공백을 출력한다.
+	public void printSpace(int num) {
 		for (int i = 0; i < num; i++)
 			System.out.print("*");
 	}
@@ -313,7 +385,7 @@ class Node {
 class Tree {
 	Node root;
 	Node nil;
-	int nodeNum;
+	int nodeCnt;
 }
 
 enum Color {
