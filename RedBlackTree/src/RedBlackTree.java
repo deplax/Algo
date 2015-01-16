@@ -3,46 +3,57 @@ import java.util.Queue;
 
 public class RedBlackTree {
 	public static void main(String[] args) {
-		Tree tree = new Tree();
-		Node node0 = new Node();
-		Node node1 = new Node();
-		Node node2 = new Node();
-		Node node3 = new Node();
-		Node node4 = new Node();
-		Node node5 = new Node();
-
-		node0.key = 10;
-		node1.key = 50;
-		node2.key = 20;
-		node3.key = 20;
-		node4.key = 70;
-		node5.key = 30;
-
-		node0.color = Color.BLACK;
-		node1.color = Color.RED;
-		node2.color = Color.BLACK;
-		node3.color = Color.RED;
-		node4.color = Color.BLACK;
-		node5.color = Color.RED;
-
-		node0.leftChild = node1;
-		node0.rightChild = node2;
-		node1.leftChild = node3;
-		node1.rightChild = node4;
-		node2.leftChild = tree.nil;
-		node2.rightChild = node5;
-		node3.leftChild = tree.nil;
-		node3.rightChild = tree.nil;
-		node4.leftChild = tree.nil;
-		node4.rightChild = tree.nil;
-		node5.leftChild = tree.nil;
-		node5.rightChild = tree.nil;
-
-		tree.root = node0;
-		tree.nodeCnt = 6;
-
+//		Tree tree = new Tree();
+//		Node node0 = new Node();
+//		Node node1 = new Node();
+//		Node node2 = new Node();
+//		Node node3 = new Node();
+//		Node node4 = new Node();
+//		Node node5 = new Node();
+//
+//		node0.key = 10;
+//		node1.key = 50;
+//		node2.key = 20;
+//		node3.key = 20;
+//		node4.key = 70;
+//		node5.key = 30;
+//
+//		node0.color = Color.BLACK;
+//		node1.color = Color.RED;
+//		node2.color = Color.BLACK;
+//		node3.color = Color.RED;
+//		node4.color = Color.BLACK;
+//		node5.color = Color.RED;
+//
+//		node0.leftChild = node1;
+//		node0.rightChild = node2;
+//		node1.leftChild = node3;
+//		node1.rightChild = node4;
+//		node2.leftChild = tree.nil;
+//		node2.rightChild = node5;
+//		node3.leftChild = tree.nil;
+//		node3.rightChild = tree.nil;
+//		node4.leftChild = tree.nil;
+//		node4.rightChild = tree.nil;
+//		node5.leftChild = tree.nil;
+//		node5.rightChild = tree.nil;
+//
+//		tree.root = node0;
+//		tree.nodeCnt = 6;
+//
+//		RedBlackTree rbt = new RedBlackTree();
+//		LinkedList<Node> nodeList = rbt.createLinkedList(tree);
+//		rbt.printTree(tree, 2);
+		
+		
 		RedBlackTree rbt = new RedBlackTree();
-		LinkedList<Node> nodeList = rbt.createLinkedList(tree);
+		Tree tree = new Tree();
+		
+		rbt.insert(tree, new Node(10));
+		rbt.insert(tree, new Node(12));
+		rbt.insert(tree, new Node(6));
+		rbt.insert(tree, new Node(2));
+		//rbt.insert(tree, new Node(3));
 		rbt.printTree(tree, 2);
 	}
 
@@ -53,15 +64,16 @@ public class RedBlackTree {
 
 		int nodeSize = nodeSize(nodeList) + pad;
 		int[] nodeSizeArr = createNodeSizeArray(nodeList, pad);
-		System.out.println("nodeSize : " + nodeSize);
-
 		int maxWidth = (nodeSize + 1) * maxLevelCnt;
 
 		int nodeNum = 0;
+		int nodeCnt = nodeSizeArr.length;
 		boolean tictok = false; // true = node;
 		for (int level = 0; level <= maxLevel; level++) {
 			int prevSpace = 0;
 			for (int col = 0; col < Math.pow(2, level) * 2; col++) {
+				if (nodeCnt == 0)
+					break;
 				if (tictok == false) {
 					// space
 					int space = (int)(maxWidth / Math.pow(2, level + 1) * (col + 1));
@@ -80,6 +92,7 @@ public class RedBlackTree {
 					else
 						printSpace(pad + 2);
 					tictok = false;
+					nodeCnt--;
 				}
 			}
 			nodeNum += Math.pow(2, level);
@@ -161,7 +174,7 @@ public class RedBlackTree {
 	// 출력을 위한 함수. 공백을 출력한다.
 	public void printSpace(int num) {
 		for (int i = 0; i < num; i++)
-			System.out.print("*");
+			System.out.print(" ");
 	}
 
 	// 1.노드는 RED or BLACK
@@ -221,6 +234,7 @@ public class RedBlackTree {
 		node.leftChild = tree.nil; // 삽입후 초기화
 		node.rightChild = tree.nil;
 		node.color = Color.RED;
+		tree.nodeCnt++;
 		insertFixup(tree, node); // FIXUP
 	}
 
@@ -300,6 +314,7 @@ public class RedBlackTree {
 			succesor.leftChild.parent = succesor;
 			succesor.color = node.color;
 		}
+		tree.nodeCnt--;
 		if (erasedColor == Color.BLACK) // BLACK이면 height문제 처리
 			deleteFixup(tree, fixupNode);
 	}
@@ -374,6 +389,12 @@ public class RedBlackTree {
 }
 
 class Node {
+		Node(int key){
+			this.key = key;
+			this.color = Color.RED;
+		}
+		Node(){};
+		
 	Color color;
 	int key;
 	Node leftChild;
@@ -383,6 +404,15 @@ class Node {
 }
 
 class Tree {
+	Tree() {
+		nil = new Node();
+		nil.color = Color.BLACK;
+		nil.leftChild = null;
+		nil.rightChild = null;
+		nil.parent = null;
+		
+		root = nil;
+	}
 	Node root;
 	Node nil;
 	int nodeCnt;
