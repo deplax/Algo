@@ -16,6 +16,7 @@ public class RedBlackTree {
 		rbt.insert(tree, new Node(65));
 		rbt.insert(tree, new Node(72));
 		rbt.insert(tree, new Node(99));
+		rbt.insert(tree, new Node(100));
 		rbt.delete(tree, tree.root);
 		rbt.printTree(tree, 2);
 
@@ -24,6 +25,8 @@ public class RedBlackTree {
 		// 3.LEAF = BLACK
 		// 4.RED는 CHILD로 BLACK을 둘 수 있음 (즉 RED RED는 불가능)
 		// 5.단순경로상의 BLACK갯수는 동일
+		
+		System.out.println("--------------------------------------------");
 		
 		System.out.println("1.Red and Black? : " + rbt.isRedBlack(tree));
 		System.out.println("2.Root = BLACK? : " + rbt.isRootBlack(tree));
