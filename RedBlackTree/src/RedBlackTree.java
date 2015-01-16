@@ -8,15 +8,27 @@ public class RedBlackTree {
 		Tree tree = new Tree();
 
 		rbt.insert(tree, new Node(10));
+		rbt.printTree(tree, 2);
 		rbt.insert(tree, new Node(12));
+		rbt.printTree(tree, 2);
 		rbt.insert(tree, new Node(-6));
+		rbt.printTree(tree, 2);
 		rbt.insert(tree, new Node(2));
+		rbt.printTree(tree, 2);
 		rbt.insert(tree, new Node(3));
+		rbt.printTree(tree, 2);
 		rbt.insert(tree, new Node(54));
+		rbt.printTree(tree, 2);
 		rbt.insert(tree, new Node(65));
+		rbt.printTree(tree, 2);
 		rbt.insert(tree, new Node(72));
+		rbt.printTree(tree, 2);
 		rbt.insert(tree, new Node(99));
+		rbt.printTree(tree, 2);
 		rbt.insert(tree, new Node(100));
+		rbt.printTree(tree, 2);
+		
+		
 		rbt.delete(tree, tree.root);
 		rbt.printTree(tree, 2);
 
@@ -25,8 +37,6 @@ public class RedBlackTree {
 		// 3.LEAF = BLACK
 		// 4.RED는 CHILD로 BLACK을 둘 수 있음 (즉 RED RED는 불가능)
 		// 5.단순경로상의 BLACK갯수는 동일
-		
-		System.out.println("--------------------------------------------");
 		
 		System.out.println("1.Red and Black? : " + rbt.isRedBlack(tree));
 		System.out.println("2.Root = BLACK? : " + rbt.isRootBlack(tree));
@@ -153,7 +163,7 @@ public class RedBlackTree {
 			nodeNum += Math.pow(2, level);
 			System.out.println();
 		}
-
+		System.out.println("--------------------------------------------------------");
 	}
 
 	// 출력을 위한 함수. 트리의 최대 깊이를 구한다. [0부터 시작]
