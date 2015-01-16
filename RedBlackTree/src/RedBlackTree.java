@@ -3,64 +3,24 @@ import java.util.Queue;
 
 public class RedBlackTree {
 	public static void main(String[] args) {
-//		Tree tree = new Tree();
-//		Node node0 = new Node();
-//		Node node1 = new Node();
-//		Node node2 = new Node();
-//		Node node3 = new Node();
-//		Node node4 = new Node();
-//		Node node5 = new Node();
-//
-//		node0.key = 10;
-//		node1.key = 50;
-//		node2.key = 20;
-//		node3.key = 20;
-//		node4.key = 70;
-//		node5.key = 30;
-//
-//		node0.color = Color.BLACK;
-//		node1.color = Color.RED;
-//		node2.color = Color.BLACK;
-//		node3.color = Color.RED;
-//		node4.color = Color.BLACK;
-//		node5.color = Color.RED;
-//
-//		node0.leftChild = node1;
-//		node0.rightChild = node2;
-//		node1.leftChild = node3;
-//		node1.rightChild = node4;
-//		node2.leftChild = tree.nil;
-//		node2.rightChild = node5;
-//		node3.leftChild = tree.nil;
-//		node3.rightChild = tree.nil;
-//		node4.leftChild = tree.nil;
-//		node4.rightChild = tree.nil;
-//		node5.leftChild = tree.nil;
-//		node5.rightChild = tree.nil;
-//
-//		tree.root = node0;
-//		tree.nodeCnt = 6;
-//
-//		RedBlackTree rbt = new RedBlackTree();
-//		LinkedList<Node> nodeList = rbt.createLinkedList(tree);
-//		rbt.printTree(tree, 2);
-		
-		
+
 		RedBlackTree rbt = new RedBlackTree();
 		Tree tree = new Tree();
-		
+
 		rbt.insert(tree, new Node(10));
 		rbt.insert(tree, new Node(12));
 		rbt.insert(tree, new Node(6));
 		rbt.insert(tree, new Node(2));
-		//rbt.insert(tree, new Node(3));
+		rbt.insert(tree, new Node(3));
+		rbt.delete(tree, tree.root);
 		rbt.printTree(tree, 2);
 	}
 
 	public void printTree(Tree tree, int pad) {
 		LinkedList<Node> nodeList = createLinkedList(tree);
 		int maxLevel = maxLevel(nodeList);
-		int maxLevelCnt = (int) Math.pow(2, maxLevel) + ((int) Math.pow(2, maxLevel) / 2);
+		int maxLevelCnt = (int) Math.pow(2, maxLevel)
+				+ ((int) Math.pow(2, maxLevel) / 2);
 
 		int nodeSize = nodeSize(nodeList) + pad;
 		int[] nodeSizeArr = createNodeSizeArray(nodeList, pad);
@@ -76,7 +36,7 @@ public class RedBlackTree {
 					break;
 				if (tictok == false) {
 					// space
-					int space = (int)(maxWidth / Math.pow(2, level + 1) * (col + 1));
+					int space = (int) (maxWidth / Math.pow(2, level + 1) * (col + 1));
 					int nodeHalf = nodeSizeArr[nodeNum + (col / 2)] / 2;
 					int prevNodeSize = (col / 2) * (nodeSize);
 					printSpace(space - nodeHalf - prevNodeSize - prevSpace);
@@ -199,18 +159,18 @@ public class RedBlackTree {
 	}
 
 	public void rightRotate(Tree tree, Node y) {
-		Node x = y.rightChild;
-		y.rightChild = x.leftChild; // 떨거지 처리
-		if (x.leftChild != tree.nil)
-			x.leftChild.parent = y;
+		Node x = y.leftChild;
+		y.leftChild = x.rightChild; // 떨거지 처리
+		if (x.rightChild != tree.nil)
+			x.rightChild.parent = y;
 		x.parent = y.parent; // y의 부모처리
 		if (y.parent == tree.nil) // x의 부모처리
 			tree.root = x;
-		else if (y == y.parent.leftChild)
-			y.parent.leftChild = x;
-		else
+		else if (y == y.parent.rightChild)
 			y.parent.rightChild = x;
-		x.leftChild = y;
+		else
+			y.parent.leftChild = x;
+		x.rightChild = y;
 		y.parent = x;
 	}
 
@@ -322,7 +282,7 @@ public class RedBlackTree {
 	// succesorNode Finder
 	public Node treeMinimum(Node node) {
 		Tree tree = new Tree();
-		while (node != tree.nil)
+		while (!node.equals(tree.nil))
 			node = node.leftChild;
 		return node.parent;
 	}
@@ -389,12 +349,59 @@ public class RedBlackTree {
 }
 
 class Node {
-		Node(int key){
-			this.key = key;
-			this.color = Color.RED;
-		}
-		Node(){};
-		
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((color == null) ? 0 : color.hashCode());
+		result = prime * result + key;
+		result = prime * result
+				+ ((leftChild == null) ? 0 : leftChild.hashCode());
+		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
+		result = prime * result
+				+ ((rightChild == null) ? 0 : rightChild.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Node other = (Node) obj;
+		if (color != other.color)
+			return false;
+		if (key != other.key)
+			return false;
+		if (leftChild == null) {
+			if (other.leftChild != null)
+				return false;
+		} else if (!leftChild.equals(other.leftChild))
+			return false;
+		if (parent == null) {
+			if (other.parent != null)
+				return false;
+		} else if (!parent.equals(other.parent))
+			return false;
+		if (rightChild == null) {
+			if (other.rightChild != null)
+				return false;
+		} else if (!rightChild.equals(other.rightChild))
+			return false;
+		return true;
+	}
+
+	Node(int key) {
+		this.key = key;
+		this.color = Color.RED;
+	}
+
+	Node() {
+	};
+
 	Color color;
 	int key;
 	Node leftChild;
@@ -410,9 +417,10 @@ class Tree {
 		nil.leftChild = null;
 		nil.rightChild = null;
 		nil.parent = null;
-		
+
 		root = nil;
 	}
+
 	Node root;
 	Node nil;
 	int nodeCnt;
