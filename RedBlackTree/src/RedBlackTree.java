@@ -9,18 +9,110 @@ public class RedBlackTree {
 
 		rbt.insert(tree, new Node(10));
 		rbt.insert(tree, new Node(12));
-		rbt.insert(tree, new Node(6));
+		rbt.insert(tree, new Node(-6));
 		rbt.insert(tree, new Node(2));
 		rbt.insert(tree, new Node(3));
+		rbt.insert(tree, new Node(54));
+		rbt.insert(tree, new Node(65));
+		rbt.insert(tree, new Node(72));
+		rbt.insert(tree, new Node(99));
 		rbt.delete(tree, tree.root);
 		rbt.printTree(tree, 2);
+
+		// 1.노드는 RED or BLACK
+		// 2.ROOT = BLACK
+		// 3.LEAF = BLACK
+		// 4.RED는 CHILD로 BLACK을 둘 수 있음 (즉 RED RED는 불가능)
+		// 5.단순경로상의 BLACK갯수는 동일
+		
+		System.out.println("1.Red and Black? : " + rbt.isRedBlack(tree));
+		System.out.println("2.Root = BLACK? : " + rbt.isRootBlack(tree));
+		System.out.println("3.NilNode is Black? : " + rbt.isNilBlack(tree));
+		System.out.println("4.RedNode child Black? : " + rbt.isRedChildBlack(tree));
+		System.out.println("5.SimplePath Nodecount same? : " + rbt.isRedChildBlack(tree));
+		
+	}
+	
+	public boolean isRedBlack(Tree tree){
+		LinkedList<Node> nodeList = createLinkedList(tree);
+		for(Node n : nodeList){
+			if(!(n.color == Color.BLACK || n.color == Color.RED) && !(n.color == null))
+				// 마지막 null 조건은 사실상 없어야 하나 트리 출력과정에서의 emptyNode를 거르기 위해 추가
+				return false;
+		}
+		return true;
 	}
 
+	public boolean isRootBlack(Tree tree) {
+		if (tree.nodeCnt > 0)
+			if (tree.root.color == Color.BLACK)
+				return true;
+			else
+				return false;
+		return false;
+	}
+	
+	public boolean isNilBlack(Tree tree){
+		if(tree.nil.color == Color.BLACK)
+			return true;
+		return false;
+	}
+	
+	public boolean isRedChildBlack(Tree tree){
+		LinkedList<Node> nodeList = createLinkedList(tree);
+		for(Node n : nodeList){
+			if(n.color == Color.RED)
+				if((n.leftChild.color == Color.RED) || (n.rightChild.color == Color.RED))
+					return false;
+		}
+		return true;
+	}
+	
+	public boolean isBlackHeightSame(Tree tree){
+		if(checkBlackHeight(tree.root) != -1)
+			return false;
+		return true;
+	}
+	
+	public int checkBlackHeight(Node node){
+		Tree tree = new Tree();
+		if(node == tree.nil)
+			return -1;
+		
+		int leftBlackHeight = 0;
+		int rightBlackHeight = 0;
+		
+		if(node.leftChild != tree.nil){
+			int cbh = checkBlackHeight(node.leftChild);
+			if(cbh == -1)
+				return -1;
+			leftBlackHeight += cbh;
+		}
+		
+		if(node.rightChild != tree.nil){
+			int cbh = checkBlackHeight(node.rightChild);
+			if(cbh == -1)
+				return -1;
+			rightBlackHeight += cbh;
+		}
+		
+		if(leftBlackHeight != rightBlackHeight)
+			return -1;
+		
+		if(node.color == Color.BLACK)
+			return leftBlackHeight + 1;
+		else
+			return leftBlackHeight;
+		
+	}
+	
+
+
+	// 출력을 위한 함수. 트리를 간격에 맞춰 콘솔에 뿌린다.
 	public void printTree(Tree tree, int pad) {
 		LinkedList<Node> nodeList = createLinkedList(tree);
 		int maxLevel = maxLevel(nodeList);
-		int maxLevelCnt = (int) Math.pow(2, maxLevel)
-				+ ((int) Math.pow(2, maxLevel) / 2);
+		int maxLevelCnt = (int) Math.pow(2, maxLevel) + ((int) Math.pow(2, maxLevel) / 2);
 
 		int nodeSize = nodeSize(nodeList) + pad;
 		int[] nodeSizeArr = createNodeSizeArray(nodeList, pad);
@@ -137,11 +229,6 @@ public class RedBlackTree {
 			System.out.print(" ");
 	}
 
-	// 1.노드는 RED or BLACK
-	// 2.ROOT = BLACK
-	// 3.LEAF = BLACK
-	// 4.RED는 CHILD로 BLACK을 둘 수 있음 (즉 RED RED는 불가능)
-	// 5.단순경로상의 BLACK갯수는 동일
 	public void leftRotate(Tree tree, Node x) {
 		Node y = x.rightChild;
 		x.rightChild = y.leftChild; // 떨거지 처리
@@ -282,9 +369,9 @@ public class RedBlackTree {
 	// succesorNode Finder
 	public Node treeMinimum(Node node) {
 		Tree tree = new Tree();
-		while (!node.equals(tree.nil))
+		while (!node.leftChild.equals(tree.nil))
 			node = node.leftChild;
-		return node.parent;
+		return node;
 	}
 
 	public void deleteFixup(Tree tree, Node fixupNode) {
@@ -355,11 +442,9 @@ class Node {
 		int result = 1;
 		result = prime * result + ((color == null) ? 0 : color.hashCode());
 		result = prime * result + key;
-		result = prime * result
-				+ ((leftChild == null) ? 0 : leftChild.hashCode());
+		result = prime * result + ((leftChild == null) ? 0 : leftChild.hashCode());
 		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
-		result = prime * result
-				+ ((rightChild == null) ? 0 : rightChild.hashCode());
+		result = prime * result + ((rightChild == null) ? 0 : rightChild.hashCode());
 		return result;
 	}
 
@@ -429,7 +514,3 @@ class Tree {
 enum Color {
 	RED, BLACK
 };
-
-// 케이스에 대한 테스트 함수
-// 레드블랙 트리 특성이 맞는지 확인하는 함수
-// ㄴ 경로상의 블랙 수가 같는지 등등.
